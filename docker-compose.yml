@@ -16,7 +16,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${root}
       - MONGO_INITDB_ROOT_PASSWORD=${pass}
     volumes:
-      - ./data/db:/data/db
+      - /home/sudipto/.myDB/sweetgin/db:/data/db
     ports:
       - 27017:27017
     command: mongod --logpath=/dev/null
