@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/sudipto-003/sweet-gin/handlers"
 	"github.com/sudipto-003/sweet-gin/repository"
 	"github.com/sudipto-003/sweet-gin/router"
 )
@@ -27,8 +26,8 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	collection := mongoClient.Database("sweetgin").Collection("parcel")
-	repo := &handlers.ParcelCollection{Collection: collection}
+	// collection := mongoClient.Database("sweetgin").Collection("parcel")
+	repo := &repository.Repos{MongoClient: mongoClient}
 
 	r := router.GetHttpRouter(repo)
 

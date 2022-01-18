@@ -7,6 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type Repos struct {
+	MongoClient *mongo.Client
+}
+
 func CreateMongoConnection(ctx context.Context, uri string) (*mongo.Client, error) {
 	conn, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	return conn, err
