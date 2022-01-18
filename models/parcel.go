@@ -1,12 +1,15 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Parcel struct {
-	ParcelId   string        `json:"_id" binding:"-"`
-	Weight     float32       `json:"weight"`
-	Status     string        `json:"status"`
-	PickedDate string        `json:"date_picked"`
-	Sender     AddressDetail `json:"sender"`
-	Receiver   AddressDetail `json:"receiver"`
+	ID         primitive.ObjectID `json:"_id"`
+	ParcelId   string             `json:"parcel_id"`
+	Weight     float32            `json:"weight"`
+	Status     string             `json:"status"`
+	PickedDate string             `json:"date_picked"`
+	Sender     AddressDetail      `json:"sender"`
+	Receiver   AddressDetail      `json:"receiver"`
 }
 
 type AddressDetail struct {
