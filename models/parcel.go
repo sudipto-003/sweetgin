@@ -3,7 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Parcel struct {
-	ID         primitive.ObjectID `json:"_id"`
+	ID         primitive.ObjectID `json:"_id" bson:"_id" binding:"-"`
 	ParcelId   string             `json:"parcel_id"`
 	Weight     float32            `json:"weight"`
 	Status     string             `json:"status"`

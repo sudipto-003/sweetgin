@@ -6,10 +6,12 @@ import (
 	"github.com/sudipto-003/sweet-gin/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func (client *Repos) CreateNewParcelOreder(ctx context.Context, parcel *models.Parcel) error {
 	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
+	parcel.ID = primitive.NewObjectID()
 	res, err := parcelColl.InsertOne(ctx, parcel)
 	if err != nil {
 		return err
@@ -23,7 +25,8 @@ func (client *Repos) GetParcelInfoById(ctx context.Context, id primitive.ObjectI
 	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
 
 	filter := bson.D{{"_id", id}}
-	if err := parcelColl.FindOne(ctx, filter).Decode(parcel); err != nil {
+	opts := options.FindOne().SetShowRecordID(true)
+	if err := parcelColl.FindOne(ctx, filter, opts).Decode(parcel); err != nil {
 		return err
 	}
 
