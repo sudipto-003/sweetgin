@@ -11,6 +11,7 @@ import (
 func (client *Repos) CreateNewParcelOreder(ctx context.Context, parcel *models.Parcel) error {
 	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
 	parcel.ID = primitive.NewObjectID()
+	parcel.ParcelId = client.GetNewPID()
 	res, err := parcelColl.InsertOne(ctx, parcel)
 	if err != nil {
 		return err
@@ -46,4 +47,15 @@ func (client *Repos) GetAllParcels(ctx context.Context) ([]models.Parcel, error)
 	}
 
 	return parcels, nil
+}
+
+func (client *Repos) GetParcelByPID(ctx context.Context, pid string, parcel *models.Parcel) error {
+	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
+
+	filter := bson.D{{"parcelid", pid}}
+	if err := parcelColl.FindOne(ctx, filter).Decode(parcel); err != nil {
+		return err
+	}
+
+	return nil
 }

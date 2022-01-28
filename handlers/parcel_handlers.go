@@ -63,3 +63,22 @@ func GetAllParcelsHandler(repo *repository.Repos) gin.HandlerFunc {
 		c.JSON(http.StatusOK, parcels)
 	}
 }
+
+func GetParcelByPID(repo *repository.Repos) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var parcel models.Parcel
+		pid := c.Param("pid")
+
+		if err := repo.GetParcelByPID(context.Background(), pid, &parcel); err != nil {
+			if err == mongo.ErrNoDocuments {
+				c.JSON(http.StatusOK, gin.H{"message": "No Such Document Exist"})
+				return
+			} else {
+				c.JSON(http.StatusServiceUnavailable, gin.H{"error": err})
+				return
+			}
+		}
+
+		c.JSON(http.StatusOK, parcel)
+	}
+}
