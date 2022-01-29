@@ -26,8 +26,21 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	// collection := mongoClient.Database("sweetgin").Collection("parcel")
-	repo := &repository.Repos{MongoClient: mongoClient}
+	redis_addr := os.Getenv("redis_addr")
+	redis_port := os.Getenv("redis_port")
+	redis_db := os.Getenv("redis_db")
+
+	r_uri := fmt.Sprintf("redis://%s:%s/%s", redis_addr, redis_port, redis_db)
+	rdb, err := repository.CreateRedisConnection(context.Background(), r_uri)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer rdb.Close()
+
+	repo := &repository.Repos{
+		MongoClient: mongoClient,
+		RedisClient: rdb,
+	}
 
 	r := router.GetHttpRouter(repo)
 
