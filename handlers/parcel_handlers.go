@@ -119,6 +119,13 @@ func GenerateOTPForParcelUpdate(repo *repository.Repos) gin.HandlerFunc {
 				return
 			}
 		}
+		otp := NewOTP()
+		err := repo.SetOTP(context.Background(), parcel.ParcelId, otp)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
 
+		c.JSON(http.StatusCreated, gin.H{"message": "OTP created successfully"})
 	}
 }
