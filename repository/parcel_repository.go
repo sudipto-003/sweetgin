@@ -61,11 +61,11 @@ func (client *Repos) GetParcelByPID(ctx context.Context, pid string, parcel *mod
 
 func (client *Repos) GetParcelByDate(ctx context.Context, date time.Time, parcels *[]models.Parcel) error {
 	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
-	// mdate := primitive.NewDateTimeFromTime(date)
 	filter := bson.D{
 		{"date_picked",
 			bson.D{
-				{"$gte", date},
+				{"$gte", date.UnixMilli()},
+				{"$lt", date.AddDate(0, 0, 1).UnixMilli()},
 			},
 		},
 	}
