@@ -2,10 +2,12 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/sudipto-003/sweet-gin/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func (client *Repos) CreateNewParcelOreder(ctx context.Context, parcel *models.Parcel) error {
@@ -32,21 +34,18 @@ func (client *Repos) GetParcelInfoById(ctx context.Context, id primitive.ObjectI
 	return nil
 }
 
-func (client *Repos) GetAllParcels(ctx context.Context) ([]models.Parcel, error) {
+func (client *Repos) GetAllParcels(ctx context.Context, parcels *[]models.Parcel) error {
 	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
-	var parcels []models.Parcel
 
 	filter := bson.D{}
-	cur, err := parcelColl.Find(ctx, filter)
+	opts := options.Find().SetSort(bson.D{{"date_picked", 1}})
+	cur, err := parcelColl.Find(ctx, filter, opts)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	if err = cur.All(ctx, &parcels); err != nil {
-		return nil, err
-	}
-
-	return parcels, nil
+	err = cur.All(ctx, parcels)
+	return err
 }
 
 func (client *Repos) GetParcelByPID(ctx context.Context, pid string, parcel *models.Parcel) error {
@@ -58,4 +57,24 @@ func (client *Repos) GetParcelByPID(ctx context.Context, pid string, parcel *mod
 	}
 
 	return nil
+}
+
+func (client *Repos) GetParcelByDate(ctx context.Context, date time.Time, parcels *[]models.Parcel) error {
+	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
+	// mdate := primitive.NewDateTimeFromTime(date)
+	filter := bson.D{
+		{"date_picked",
+			bson.D{
+				{"$gte", date},
+			},
+		},
+	}
+
+	cur, err := parcelColl.Find(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	err = cur.All(ctx, parcels)
+	return err
 }

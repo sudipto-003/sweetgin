@@ -15,6 +15,7 @@ func GetHttpRouter(repo *repository.Repos) *gin.Engine {
 	router.GET("/getorder", handlers.GetParcelByIDHandler(repo))
 	router.GET("/allorder", handlers.GetAllParcelsHandler(repo))
 	router.GET("/parcel/:pid", handlers.GetParcelByPID(repo))
+	router.GET("parcel/date", handlers.GetParcelsByDate(repo))
 
 	return router
 }
