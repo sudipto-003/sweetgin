@@ -138,7 +138,7 @@ type UserOTP struct {
 func VerifyAndUpdateParcel(repo *repository.Repos) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user_otp UserOTP
-		// var parcel models.Parcel
+		var parcel models.Parcel
 		pid := c.Param("pid")
 		if err := c.ShouldBindJSON(&user_otp); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -156,6 +156,15 @@ func VerifyAndUpdateParcel(repo *repository.Repos) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "OTP Verfied Succesfully"})
+		if err := repo.UpdateParcelStatus(context.Background(), pid, &parcel); err != nil {
+			if err == mongo.ErrNoDocuments {
+				c.JSON(http.StatusNoContent, gin.H{"error": "No valid parcel ID"})
+				return
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+			}
+		}
+
+		c.JSON(http.StatusAccepted, parcel)
 	}
 }

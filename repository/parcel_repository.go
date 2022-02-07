@@ -78,3 +78,20 @@ func (client *Repos) GetParcelByDate(ctx context.Context, date time.Time, parcel
 	err = cur.All(ctx, parcels)
 	return err
 }
+
+func (client *Repos) UpdateParcelStatus(ctx context.Context, pid string, parcel *models.Parcel) error {
+	parcelColl := client.MongoClient.Database("sweetgin").Collection("parcel")
+	filter := bson.D{{"parcelid", pid}}
+	update := bson.D{
+		{"$set",
+			bson.D{
+				{"status", "delivered"},
+			},
+		},
+	}
+	opts := options.FindOneAndUpdate()
+	opts.SetReturnDocument(options.After)
+	err := parcelColl.FindOneAndUpdate(ctx, filter, update, opts).Decode(parcel)
+
+	return err
+}
