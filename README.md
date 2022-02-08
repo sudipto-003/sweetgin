@@ -193,3 +193,15 @@ Document *status* changed to *delivered*
     }
 }
 ```
+
+### Custom Utilities
+
+- String-Date custom marshal-unmarshal to support JSON format with gin.
+- unique 10digit parcel id generator for parcels in mongodb(mongodb _id is a little bit long for human use)
+- generating simple usage 6 digit OTP from the normal distribution of digits
+
+### References
+
+- [Go-Gin](https://github.com/gin-gonic/gin)
+- mongodb driver for go [mongo](https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo?utm_source=godoc)
+- redis driver for go [go-redis](https://github.com/go-redis/redis/)
