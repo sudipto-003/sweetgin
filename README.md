@@ -13,3 +13,183 @@ Go-gin router handles the http requests, dispatches the request to appropiate ha
 
 ## API Endpoints
 
+### Create New Parcel Order
+Creating new parcel delivey order by given JSON object, a custom string to date object parser is used as gin default string to date parser works for only form data. curl request is as following
+
+```shell
+cURL --location --request POST 'http://0.0.0.0:8080/neworder' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "weight": 25.0,
+    "status": "picked",
+    "date_picked": "07-02-2021",
+    "sender": {
+        "name": "ABC",
+        "phone": "+88017xxxxxxxx",
+        "address": "Dhanmondi, Dhaka",
+        "zip_code": "1209"
+    },
+    "receiver": {
+        "name": "XYZ",
+        "phone": "+88014xxxxxxxx",
+        "address": "Notun Bazar, Barishal",
+        "zip_code": "8200"
+    }
+}'
+```
+
+Response 
+
+```json
+{
+    "_id": "62014e51cd62022b533ef466",
+    "parcel_id": "2202070001",
+    "weight": 25,
+    "status": "picked",
+    "date_picked": "07-02-2021",
+    "sender": {
+        "name": "ABC",
+        "phone": "+88017xxxxxxxx",
+        "address": "Dhanmondi, Dhaka",
+        "zip_code": "1209"
+    },
+    "receiver": {
+        "name": "XYZ",
+        "phone": "+88014xxxxxxxx",
+        "address": "Notun Bazar, Barishal",
+        "zip_code": "8200"
+    }
+}
+```
+
+### Get All Parcel Orders
+
+cURL Request format
+
+```
+curl --location --request GET 'http://0.0.0.0:8080/allorder'
+```
+
+Response: list of json objects
+
+### Filtering Parcel orders by Date
+
+cURL Request format
+
+```
+curl --location --request GET 'http://0.0.0.0:8080/parcel/date?date=07-02-2021'
+```
+
+Response
+
+```json
+[
+    {
+        "_id": "62014e51cd62022b533ef466",
+        "parcel_id": "2202070001",
+        "weight": 25,
+        "status": "picked",
+        "date_picked": "07-02-2021",
+        "sender": {
+            "name": "ABC",
+            "phone": "+88017xxxxxxxx",
+            "address": "Dhanmondi, Dhaka",
+            "zip_code": "1209"
+        },
+        "receiver": {
+            "name": "XYZ",
+            "phone": "+88014xxxxxxxx",
+            "address": "Notun Bazar, Barishal",
+            "zip_code": "8200"
+        }
+    },
+    {
+        "_id": "6201505fcd62022b533ef467",
+        "parcel_id": "2202070002",
+        "weight": 30,
+        "status": "picked",
+        "date_picked": "07-02-2021",
+        "sender": {
+            "name": "ABC",
+            "phone": "+88017xxxxxxxx",
+            "address": "Dhanmondi, Dhaka",
+            "zip_code": "1209"
+        },
+        "receiver": {
+            "name": "XXX",
+            "phone": "+88013xxxxxxxx",
+            "address": "Sonadanga, Khulna",
+            "zip_code": "9000"
+        }
+    },
+    ...
+    ...
+]
+```
+
+### Get Parcel By Parcel ID
+
+cURL request format (baseurl/parcel/<parcel_id>)
+
+```
+curl --location --request GET 'http://0.0.0.0:8080/parcel/2202070003'
+```
+
+### Verify Receiver
+Generates OTP, stores the OTP in the Redis Server with expiry(5 Minutes) and send the OTP to receiver's phone number.
+
+```
+curl --location --request POST 'http://0.0.0.0:8080/parcel/2202070003/deliver'
+```
+
+**Http Response**
+
+Status Code on Success **201** with following message
+
+```json
+{
+    "message": "OTP created successfully"
+}
+```
+### Verify OTP and Update
+Verify the OTP and update parcel status if success.
+
+```
+curl --location --request POST 'http://0.0.0.0:8080/parcel/2202070003/verify' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "otp": "369358"
+}'
+```
+
+**Http Response**
+
+- Status Code **408** => OTP expired or wrong PID
+- Status Code **401** => OTP does not match
+- Status Code **202** => OTP matched and updated successfully
+- Status Code **404** => No such parcel
+
+Demo response on success
+Document *status* changed to *delivered*
+
+```json
+{
+    "_id": "6201505fcd62022b533ef467",
+    "parcel_id": "2202070002",
+    "weight": 30,
+    "status": "delivered",
+    "date_picked": "07-02-2021",
+    "sender": {
+        "name": "ABC",
+        "phone": "+88017xxxxxxxx",
+        "address": "Dhanmondi, Dhaka",
+        "zip_code": "1209"
+    },
+    "receiver": {
+        "name": "XXX",
+        "phone": "+88013xxxxxxxx",
+        "address": "Sonadanga, Khulna",
+        "zip_code": "9000"
+    }
+}
+```
